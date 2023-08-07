@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, create_engine
 from flaskext.markdown import Markdown
 import config
 
@@ -14,10 +14,11 @@ naming_convention = {
 }
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
-#
+
 
 def create_app():
     app = Flask(__name__)
+
     app.config.from_object(config)
     Markdown(app, extensions=['nl2br', 'fenced_code'])
 
