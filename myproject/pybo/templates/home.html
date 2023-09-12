@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 200px;
+            height: 400px;
+            background-color: #f0f0f0;
+            overflow: auto;
+        }
+
+        .category {
+            position: relative;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .category ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .category li {
+            margin-bottom: 10px;
+        }
+
+        .toggle-button {
+            width: 20px;
+            height: 40px;
+            background-color: #333;
+            position: relative;
+            top: 25%;
+            right: 5px; /* 왼쪽으로 50px 이동 */
+            transform: translateY(-50%);
+            cursor: pointer;
+            transition: transform 1s ease-in-out;
+            border-radius: 4px;
+            display: flex;
+            align-items: center; /* 세로 가운데 정렬 */
+            justify-content: center; /* 가로 가운데 정렬 */
+            color: white; /* 아이콘 색상 설정 */
+            font-size: 20px; /* 아이콘 크기 설정 */
+        }
+
+        .container.show-sidebar .sidebar {
+            width: 0;
+        }
+
+        .container.hide-sidebar .sidebar {
+            left: -200px;
+        }
+
+        .container.hide-sidebar .toggle-button {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        /* 추가한 스타일 */
+        .category-details {
+            display: none;
+            padding-left: 15px;
+        }
+
+        .category.active .category-details {
+            display: block;
+
+        .content-container {
+            display: flex;
+        }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="col-md-10">
+        <div class="container-fluid">
+            <div class="card-deck">
+                {% for question in question_list %}
+                    <div class="card" style="height: 300px; margin: 15px;">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ url_for('question.detail', question_id=question.id) }}">{{ question.subject }}</a>
+                            </h5>
+                            <p class="card-text">{{ question.user.username }}</p>
+                            <p class="card-text">{{ question.create_date|datetime }}</p>
+                            <p class="card-text">{{ question.category }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function toggleSidebar() {
+            const container = document.querySelector('.container');
+            container.classList.toggle('show-sidebar');
+            container.classList.toggle('hide-sidebar');
+        }
+
+        document.addEventListener('change', function(event) {
+            if (event.target.type === 'checkbox') {
+                const item_id = event.target.id.split('_')[2];
+                const checked = event.target.checked ? 1 : 0;
+                fetch(`/update_checklist/${item_id}/${checked}`);
+            }
+        });
+    </script>
+</body>
+{% endblock %}

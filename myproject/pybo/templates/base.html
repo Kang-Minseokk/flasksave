@@ -8,13 +8,41 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
     <!-- pybo CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Hello, Pybo!</title>
+    <title>블로그!</title>
+    <style>
+        .sidebar {
+            width: 200px;
+            height: 400px;
+            background-color: #f0f0f0;
+            overflow: auto;
+        }
+    </style>
 </head>
+
 <body>
 {% include "navbar.html" %}
 <!-- 기본 템플릿에 삽입할 내용 Start-->
-{% block content %}
-{% endblock %}
+<div class="row">
+    <div class="col-md-2">
+        <div class="sidebar">
+            <div class="category">
+                <ul>
+                    <li><a href="{{ url_for('question.ds_list') }}">Data Science</a></li>
+                    <li><a href="{{ url_for('question.d_list') }}">Development</a></li>
+                    <li><a href="{{ url_for('question.cs_list') }}">Computer Science</a></li>
+                    <li><a href="{{ url_for('question.ai_list') }}">Artificial Intelligence</a></li>
+                    <li><a href="{{ url_for('question.r_list') }}">Relaxation</a></li>
+                    <li><a href="{{ url_for('question.c_list') }}">Communication</a></li>
+                    <li><a href="{{ url_for('goal.list') }}">My Goal</a></li>
+                    <li><a href="{{ url_for('calendar.show') }}">Calendar</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% block content %}
+    {% endblock %}
+</div>
+
 <!-- 기본 템플릿에 삽입할 내용 End -->
 <!-- jQuery JS -->
 <script src="{{ url_for('static', filename='jquery-3.7.0.min.js') }}"></script>
@@ -25,4 +53,5 @@
 {% endblock %}
 
 </body>
+
 </html>

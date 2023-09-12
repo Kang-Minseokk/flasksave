@@ -1,5 +1,6 @@
 from pybo import db
 
+
 question_voter = db.Table(
     'question_voter',
     db.Column('user_id', db.Integer, db.ForeignKey(
@@ -16,8 +17,9 @@ answer_voter = db.Table(
         'answer.id', ondelete='CASCADE'), primary_key=True)
 )
 
+
 class Question(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     subject = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text(), nullable=False)
     create_date = db.Column(db.DateTime(), nullable=False)
@@ -25,11 +27,14 @@ class Question(db.Model):
     user = db.relationship('User', backref=db.backref('question_set'))
     modify_date = db.Column(db.DateTime(), nullable=True)
     voter = db.relationship('User', secondary=question_voter, backref=db.backref('question_voter_set'))
-
+    category = db.Column(db.String(100), nullable=False)
+    tag = db.Column(db.String(30), nullable=True)
+    visit_count = db.Column(db.Integer, default=0, nullable=False)
+    views = db.Column(db.Integer, default=0)
 
 
 class Answer(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id', ondelete='CASCADE'))
     question = db.relationship('Question', backref=db.backref('answer_set', ))
     content = db.Column(db.Text(), nullable=False)
@@ -40,12 +45,13 @@ class Answer(db.Model):
     voter = db.relationship('User', secondary=answer_voter, backref=db.backref('answer_voter_set'))
 
 
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(200), unique=True, nullable=False)
+    profile_img = db.Column(db.String(200), nullable=True, default='minsoek.png')
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    subscribe_num = db.Column(db.Integer, default=0)
 
 
 class Comment(db.Model):
@@ -59,3 +65,27 @@ class Comment(db.Model):
     question = db.relationship('Question', backref=db.backref('comment_set'))
     answer_id = db.Column(db.Integer, db.ForeignKey('answer.id', ondelete='CASCADE'), nullable=True)
     answer = db.relationship('Answer', backref=db.backref('comment_set'))
+
+
+class VisitCount(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    count = db.Column(db.Integer, default=0)
+
+
+class Goal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text(), nullable=False)
+    content = db.Column(db.Text(), nullable=False)
+    period = db.Column(db.String(100), nullable=False)
+    done = db.Column(db.Boolean(), nullable=False, default=0)
+
+
+class Calendar(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text(), nullable=True)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+
+
+
