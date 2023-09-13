@@ -1,3 +1,5 @@
+from sqlalchemy import PrimaryKeyConstraint
+
 from pybo import db
 
 
@@ -16,6 +18,11 @@ answer_voter = db.Table(
     db.Column('answer_id', db.Integer, db.ForeignKey(
         'answer.id', ondelete='CASCADE'), primary_key=True)
 )
+
+
+class Subscriber(db.Model):
+    from_user_id = db.Column(db.Integer, nullable=False, primary_key=True)
+    to_user_id = db.Column(db.Integer, nullable=False, primary_key=True)
 
 
 class Question(db.Model):

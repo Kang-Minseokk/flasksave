@@ -19,23 +19,31 @@
             margin-left: 10px;
             display: inline;
         }
-
-
     </style>
 </head>
 
 <div class="col-md-10">
     <div class="content_row">
         <img class="profile-image" src="{{ url_for('static', filename='image/'+ profile_img_path) }}">
-        <form class="subscribe-btn" method="post" action="{{ url_for('auth.subscribe', user_id=user_id) }}">
+        <form class="subscribe-btn" method="post" action="{{ url_for('auth.subscribe', from_user_id=g.user.id,
+        to_user_id=to_user_id) }}">
             <button type="submit" class="btn btn-primary">Subscribe</button>
         </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
         <div class="card">
             <ul>
                 <li>Username: {{ user_name }}</li>
-                <li>Number of posts: {{ user_question_num }}</li>
-                <li>Number of subscribe: {{ user_subscribe_num }}</li>
-                <li>{{ user_total_recommend }}</li>
+                <li>Posts: {{ user_question_num }}</li>
+                <li>Followers: {{ user_subscribe_num }}</li>
+                <li>Recommended: {{ user_total_recommend }}</li>
             </ul>
         </div>
     </div>
@@ -71,7 +79,7 @@
                         </td>
                         <td><a href="{{ url_for('auth.user_info', user_id=question.user.id) }}">{{ question.user.username }}</a></td>
                         <td>{{ question.create_date|datetime }}</td>
-                        <td>{{ question.visit_count }} </td>
+                        <td>{{ question.views }} </td>
                     </tr>
                 {% endfor %}
             {% endif %}
@@ -119,4 +127,7 @@
     </ul>
     </div>
 </div>
+
 {% endblock %}
+
+

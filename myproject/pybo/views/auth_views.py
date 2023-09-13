@@ -2,16 +2,38 @@ import os
 
 from flask import Blueprint, url_for, render_template, flash, request, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import redirect, secure_filename
+from werkzeug.utils import redirect
 import functools
 
 
 from pybo import db
 from pybo.forms import UserCreateForm, UserLoginForm, EmailForm
-from pybo.models import User, Question, question_voter
+from pybo.models import User, Question, question_voter, Subscriber
 import random, string
 
+
 bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login'))
+        return view(**kwargs)
+
+    return wrapped_view
+
+
+def power_login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None or g.user.username != "강민석":
+            flash("Special Access Required!!", "warning")
+            return redirect(url_for('auth.login'))
+        return view(**kwargs)
+
+    return wrapped_view
 
 
 @bp.route('/signup/', methods=('GET', 'POST'))
@@ -93,7 +115,8 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@bp.route('/user_info/<int:user_id>')
+@bp.route('/user_info/<int:user_id>/')
+@login_required
 def user_info(user_id):
     page = request.args.get('page', type=int, default=1)
     user_question_list = Question.query.filter(Question.user_id == user_id).order_by(Question.create_date.desc())
@@ -104,41 +127,38 @@ def user_info(user_id):
     user_total_recommend = db.session.query(question_voter).filter(question_voter.c.user_id == user_id).count()
     profile_img_path = User.query.get_or_404(user_id).profile_img
     user_subscribe_num = user.subscribe_num
-    return render_template('auth/user_information.html', user_id=user_id,
+    return render_template('auth/user_information.html', to_user_id=user_id,
                            user_question_list=user_question_list, user_name=user_name,
                            user_question_num=user_question_num, user_total_recommend=user_total_recommend,
                            profile_img_path=profile_img_path, user_subscribe_num=user_subscribe_num)
 
 
-@bp.route('/subscribe/<int:user_id>/', methods=('GET', 'POST'))
-def subscribe(user_id):
-    user = User.query.get_or_404(user_id)
-    form = UserCreateForm()
+@bp.route('/subscribe/<int:to_user_id>/<int:from_user_id>/', methods=('GET', 'POST'))
+@login_required
+def subscribe(from_user_id, to_user_id):
+    user = User.query.get_or_404(to_user_id)
     if request.method == 'POST':
-        user.subscribe_num += 1
-        db.session.commit()
-        return redirect(url_for('auth.user_info', user_id=user_id))
-    return redirect(url_for('auth.user_info', user_id=user_id, form=form))
+        existing_subscription = Subscriber.query.filter_by(
+            from_user_id=from_user_id,
+            to_user_id=to_user_id
+        ).first()
+        if from_user_id == to_user_id:
+            flash('본인을 구독할 수 없습니다!')
+        else:
+            if not existing_subscription:
+                user.subscribe_num += 1
+                subscribe_status = Subscriber(
+                    from_user_id=from_user_id,
+                    to_user_id=to_user_id
+                )
+                db.session.add(subscribe_status)
+                db.session.commit()
+                return redirect(url_for('auth.user_info', user_id=to_user_id))
+            else:
+                flash('이미 구독을 하셨습니다!')
+    return redirect(url_for('auth.user_info', user_id=to_user_id))
 
 
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
 
-    return wrapped_view
-
-
-def power_login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None or g.user.username != "강민석":
-            flash("Special Access Required!!", "warning")
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-
-    return wrapped_view
 
 

@@ -48,7 +48,7 @@
                             </td>
                             <td><a href="{{ url_for('auth.user_info', user_id=question.user.id) }}">{{ question.user.username }}</a></td>
                             <td>{{ question.create_date|datetime }}</td>
-                            <td>{{ question.visit_count }} </td>
+                            <td>{{ question.views }} </td>
                         </tr>
                     {% endfor %}
                 {% else %}

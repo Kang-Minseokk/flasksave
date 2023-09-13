@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, render_template, request, url_for, g, flash, escape
+from flask import Blueprint, render_template, request, url_for, g, flash, escape, session
 from sqlalchemy import func
 from werkzeug.utils import redirect
 
@@ -292,9 +292,20 @@ def c_list():
 
 
 @bp.route('/detail/<int:question_id>/')
+@login_required
 def detail(question_id):
-    form = AnswerForm()
+    # 조회수 중복을 막는 코드..
+    user_id = g.user.id
+    if 'user_data' not in session:
+        session['user_data'] = []
     question = Question.query.get_or_404(question_id)
+    if {question_id: user_id} not in session['user_data']:
+        session['user_data'].append({question_id: user_id})
+        question.views += 1
+    else:
+        pass
+    # 조회수 중복 방지 코드 끝..
+    form = AnswerForm()
     question_content = question.content
     db.session.commit()
     return render_template('question/question_detail.html', question=question, form=form,

@@ -1,9 +1,10 @@
-from flask import Flask
+from flask import Flask, session
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flaskext.markdown import Markdown
 import config
+from flask_session import Session
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -20,6 +21,8 @@ def create_app():
     app = Flask(__name__)
 
     app.config.from_object(config)
+    app.config['SESSION_TYPE'] = 'filesystem'
+    Session(app)
     Markdown(app, extensions=['nl2br', 'fenced_code'])
 
     # ORM
