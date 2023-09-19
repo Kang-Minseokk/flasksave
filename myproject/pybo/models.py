@@ -1,5 +1,3 @@
-from sqlalchemy import PrimaryKeyConstraint
-
 from pybo import db
 
 
@@ -35,8 +33,7 @@ class Question(db.Model):
     modify_date = db.Column(db.DateTime(), nullable=True)
     voter = db.relationship('User', secondary=question_voter, backref=db.backref('question_voter_set'))
     category = db.Column(db.String(100), nullable=False)
-    tag = db.Column(db.String(30), nullable=True)
-    visit_count = db.Column(db.Integer, default=0, nullable=False)
+    tag = db.Column(db.String(30), nullable=True, default='ETC')
     views = db.Column(db.Integer, default=0)
 
 
@@ -59,6 +56,7 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     subscribe_num = db.Column(db.Integer, default=0)
+
 
 
 class Comment(db.Model):
@@ -93,6 +91,3 @@ class Calendar(db.Model):
     content = db.Column(db.Text(), nullable=True)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
-
-
-

@@ -25,4 +25,4 @@ def index():
         db.session.add(new_visit_count)
         db.session.commit()
 
-    return render_template('home.html', visit_count=visit_count, question_list=question_list)
+    return render_template('home.html', question_list=question_list)

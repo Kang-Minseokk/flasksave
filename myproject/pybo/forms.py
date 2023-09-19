@@ -15,10 +15,7 @@ class QuestionForm(FlaskForm):
         ('Relaxation', 'Relaxation'),
         ('Communication', 'Communication')
     ], validators=[DataRequired('카테고리를 선택해주세요')])
-    tag = TextAreaField('태그')
-
-
-
+    tag = TextAreaField('태그', validators=[DataRequired('태그는 최소 한개를 선택을 해야 합니다')])
 
 
 class AnswerForm(FlaskForm):

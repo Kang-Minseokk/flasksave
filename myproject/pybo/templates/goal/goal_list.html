@@ -100,7 +100,7 @@
         <div class="container-fluid">
             <div class="col">
                 <a href="{{ url_for('goal.divided_list', num=3) }}" class="text">Books to Read</a>
-                <progress class="percent_bar" value="{{ book_goal_list.count() }}" max="{{ achieved_book_goal.count() }}"></progress>
+                <progress class="percent_bar" value="{{ achieved_book_goal.count() }}" max="{{ book_goal_list.count() }}"></progress>
             </div>
             <div class="scrollable-table">
                 <table class="table">
